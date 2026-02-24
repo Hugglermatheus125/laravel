@@ -12,5 +12,3 @@ class Principal extends Controller
 
     
 }
-
-
