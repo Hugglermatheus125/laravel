@@ -12,11 +12,32 @@ class ProfessorController extends Controller
     }
 
     function add(Request $dados) {
+        $validator = Validator::make(
+		      $dados->all(),
+	            [
+	                'nome' => 'required|min:3|max:255',
+                    'email' => 'required|email|unique:professores,email',
+                    'telefone' => 'required|digits:11',
+	            ],
+	            [
+	                'nome.required' => 'O campo nome é obrigatório.',
+	                'nome.min' => 'O campo nome deve conter no mínimo 3 caracteres.',
+	                'nome.max' => 'O campo nome deve conter no máximo 255 caracteres.',
+	                'email.required' => 'O campo email é obrigatório.',
+	                'email.email' => 'O campo email deve ser um endereço de email válido.',
+	                'email.unique' => 'O campo email já está em uso.',
+	                'telefone.required' => 'O campo telefone é obrigatório.',
+	                'telefone.digits' => 'O campo telefone deve conter 11 dígitos.',
+	            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }        
         $professor = new \App\Models\ProfessorModel();
         $professor::create($dados->all());
-				
         $professores = new \App\Models\ProfessorModel();
-        return view('professor.index', ['success'=>'Cadastrado!', 'professores'=>$professores::all()]);
+        return response()->json($professores->all(), 200);
     }
 
     function remove(string $id) {

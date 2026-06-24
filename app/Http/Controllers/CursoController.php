@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CursoController extends Controller
 {
@@ -12,11 +13,28 @@ class CursoController extends Controller
     }
 
     function add(Request $dados) {
+        $validator = Validator::make(
+		      $dados->all(),
+	            [
+	                'nome' => 'required|min:3|max:255',
+                    'periodo' => 'required|date_format:Y-m-d',
+	            ],
+	            [
+	                'nome.required' => 'O campo nome é obrigatório.',
+	                'nome.min' => 'O campo nome deve conter no mínimo 3 caracteres.',
+	                'nome.max' => 'O campo nome deve conter no máximo 255 caracteres.',
+	                'periodo.required' => 'O campo período é obrigatório.',
+	                'periodo.date_format' => 'O campo período deve estar no formato ANO-MÊS-DIA.',
+	            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }        
         $curso = new \App\Models\CursoModel();
         $curso::create($dados->all());
-				
         $cursos = new \App\Models\CursoModel();
-        return view('curso.index', ['success'=>'Cadastrado!', 'cursos'=>$cursos::all()]);
+        return response()->json($cursos->all(), 200);
     }
 
     function remove(string $id) {
