@@ -26,6 +26,15 @@
         @isset($success)
             <h1>{{ $success }}</h1>
         @endisset
+        @if ($errors->any())
+            <div>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </form>
 
     <table border="1">
@@ -51,11 +60,13 @@
                         <td>{{ $administrador->status }}</td>
                         <td>
                             <form action="{{ route('administrador.remove', ['id' => $administrador->id]) }}" method="GET">
+                                @csrf
                                 <button type="submit">Remover</button>
                             </form>
                         </td>
                         <td>
-                        <form action="{{ route('administrador.atualizar', ['id' => $administrador->id]) }}" method="GET">
+                            <form action="{{ route('administrador.atualizar', ['id' => $administrador->id]) }}" method="GET">
+                                @csrf
                                 <button type="submit">Atualizar</button>
                             </form>
                         </td>
